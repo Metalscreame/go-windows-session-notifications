@@ -67,8 +67,9 @@ func relayMessage(message C.uint, wParam C.uint) {
 // chanSessionEnd will receive a '1' when the session ends (when Windows shut down)
 // To unsubscribe, close closeChan
 // You must close 'ChanOk' after processing the event. This channel is to give you time to save if the event is WM_QUERYENDSESSION
-func Subscribe(subchanMessages chan Message, closeChan chan int) {
+func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan error) {
 	var threadHandle C.HANDLE
+
 	go func() {
 		for {
 			select {
@@ -76,9 +77,9 @@ func Subscribe(subchanMessages chan Message, closeChan chan int) {
 				C.Stop(threadHandle)
 				r, _, err := CloseHandle.Call(uintptr(threadHandle))
 				if r == 0 {
-					panic(err)
+					errChan <- err
+					return
 				}
-
 				return
 			case c := <-chanMessages:
 				subchanMessages <- c

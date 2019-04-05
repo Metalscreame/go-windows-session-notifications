@@ -94,7 +94,6 @@ func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan er
 				for _, ch := range channels {
 					ch <- c
 				}
-				subchanMessages <- c
 			}
 		}
 	}()

@@ -10,6 +10,7 @@ import "C"
 
 import (
 	"syscall"
+	"time"
 )
 
 // http://msdn.microsoft.com/en-us/library/aa383828(v=vs.85).aspx
@@ -35,7 +36,7 @@ const (
 	ENDSESSION_SHUTDOWN = 0x0
 
 	CTRL_SHUTDOWN = 10
-	CTRL_LOGOFF = 20
+	CTRL_LOGOFF   = 20
 )
 
 type Message struct {
@@ -45,7 +46,9 @@ type Message struct {
 }
 
 var (
-	chanMessages = make(chan Message, 1000)
+	// channels to send the response back from library
+	channels     []chan Message
+	chanMessages = make(chan Message, 100)
 
 	kernel32    = syscall.MustLoadDLL("kernel32.dll")
 	CloseHandle = kernel32.MustFindProc("CloseHandle")
@@ -61,6 +64,7 @@ func relayMessage(message C.uint, wParam C.uint) {
 
 	chanMessages <- msg
 
+	time.Sleep(time.Second * 2)
 	// wait for the app to do it's thing
 	// it's usefull for WM_QUERYENDSESSION if we need time to save before Windows shutdown
 	<-msg.ChanOk
@@ -72,6 +76,8 @@ func relayMessage(message C.uint, wParam C.uint) {
 // You must close 'ChanOk' after processing the event. This channel is to give you time to save if the event is WM_QUERYENDSESSION
 func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan error) {
 	var threadHandle C.HANDLE
+	// adding subscribers
+	channels = append(channels, subchanMessages)
 
 	go func() {
 		for {
@@ -85,6 +91,9 @@ func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan er
 				}
 				return
 			case c := <-chanMessages:
+				for _, ch := range channels {
+					ch <- c
+				}
 				subchanMessages <- c
 			}
 		}

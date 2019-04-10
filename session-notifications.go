@@ -10,7 +10,6 @@ import "C"
 
 import (
 	"syscall"
-	"time"
 )
 
 // http://msdn.microsoft.com/en-us/library/aa383828(v=vs.85).aspx

@@ -22,7 +22,7 @@ BOOL WINAPI HandlerRoutine(DWORD dwCtrlType)
 		}
 	default:
 		{
-        relayMessage(CTRL_ERROR, CTRL_ERROR);
+            фrelayMessage(CTRL_ERROR, CTRL_ERROR);
 		}
 	}
 	return FALSE;
@@ -37,7 +37,5 @@ HANDLE Start() {
     HANDLE hThread;
 
     if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE))
-                relayMessage(CTRL_ERROR, CTRL_ERROR);
-
-    while (1){}
+           relayMessage(CTRL_ERROR, CTRL_ERROR);
 }

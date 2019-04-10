@@ -64,7 +64,6 @@ func relayMessage(message C.uint, wParam C.uint) {
 
 	chanMessages <- msg
 
-	time.Sleep(time.Second * 2)
 	// wait for the app to do it's thing
 	// it's usefull for WM_QUERYENDSESSION if we need time to save before Windows shutdown
 	<-msg.ChanOk
@@ -74,21 +73,13 @@ func relayMessage(message C.uint, wParam C.uint) {
 // chanSessionEnd will receive a '1' when the session ends (when Windows shut down)
 // To unsubscribe, close closeChan
 // You must close 'ChanOk' after processing the event. This channel is to give you time to save if the event is WM_QUERYENDSESSION
-func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan error) {
-	var threadHandle C.HANDLE
+func Subscribe(subchanMessages chan Message, closeChan chan int) {
 	// adding subscribers
 	channels = append(channels, subchanMessages)
-
 	go func() {
 		for {
 			select {
 			case <-closeChan:
-				C.Stop(threadHandle)
-				r, _, err := CloseHandle.Call(uintptr(threadHandle))
-				if r == 0 {
-					errChan <- err
-					return
-				}
 				return
 			case c := <-chanMessages:
 				for _, ch := range channels {
@@ -97,5 +88,5 @@ func Subscribe(subchanMessages chan Message, closeChan chan int, errChan chan er
 			}
 		}
 	}()
-	threadHandle = C.Start()
+	C.Start()
 }

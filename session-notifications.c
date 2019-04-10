@@ -28,10 +28,6 @@ BOOL WINAPI HandlerRoutine(DWORD dwCtrlType)
 	return FALSE;
 }
 
-void Stop(HANDLE hndl) {
-    TerminateThread(hndl, 0);
-}
-
 HANDLE Start() {
     DWORD lpThreadId, lpParameter = 1;
     HANDLE hThread;

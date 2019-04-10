@@ -22,7 +22,7 @@ BOOL WINAPI HandlerRoutine(DWORD dwCtrlType)
 		}
 	default:
 		{
-            фrelayMessage(CTRL_ERROR, CTRL_ERROR);
+            relayMessage(CTRL_ERROR, CTRL_ERROR);
 		}
 	}
 	return FALSE;

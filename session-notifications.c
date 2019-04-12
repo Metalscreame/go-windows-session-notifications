@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <WtsApi32.h>
+#include <wtsapi32.h>
 #include "_cgo_export.h"
 
 #define CTRL_SHUTDOWN  10
